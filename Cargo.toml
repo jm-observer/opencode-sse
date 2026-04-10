@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+sseer = { version = "0.2", features = ["reqwest"] }
 thiserror = "1.0"
+futures = "0.3"
 tokio = { version = "1", features = ["full"] }
 log = "0.4"
 custom-utils = "0.10.21"
