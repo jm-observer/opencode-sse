@@ -8,13 +8,10 @@ use opencode_api::types::{
 };
 use tokio::io::{self, AsyncBufReadExt, BufReader};
 
-const DEFAULT_SERVER: &str = "127.0.0.1:4097";
-
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize client with configurable server address
-    let server_addr = std::env::var("OPENCODE_SERVER").unwrap_or_else(|_| DEFAULT_SERVER.to_string());
-    let client = OpencodeClient::with_base_url(&server_addr).context("failed to create Opencode client")?;
+    let client = OpencodeClient::with_base_url("http://127.0.0.1:4097").context("failed to create Opencode client")?;
 
     // Create a session for prompting
     let session_resp = client
@@ -29,6 +26,7 @@ async fn main() -> Result<()> {
         })
         .await
         .context("failed to create session")?;
+    println!("{session_resp:?}");
     let SessionCreateResponse::Ok(session) = session_resp else {
         anyhow::bail!("session creation returned unexpected response");
     };
