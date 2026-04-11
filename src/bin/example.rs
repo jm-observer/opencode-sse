@@ -3,15 +3,17 @@
 use anyhow::{Context, Result};
 use futures::StreamExt;
 use opencode_api::types::{
-    EventSubscribeRequest, EventSubscribeResponse, MessageRequestBody, OpencodeClient, PartKind2, SessionCreateRequest,
-    SessionCreateRequestQuery, SessionCreateResponse, SessionPromptRequest, SessionRequestBody, TextPartInput,
+    Event, EventSubscribeRequest, EventSubscribeResponse, MessageRequestBody, OpencodeClient, PartKind2,
+    SessionCreateRequest, SessionCreateRequestQuery, SessionCreateResponse, SessionPromptRequest, SessionRequestBody,
+    TextPartInput,
 };
+use std::collections::HashMap;
 use tokio::io::{self, AsyncBufReadExt, BufReader};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize client with configurable server address
-    let client = OpencodeClient::with_base_url("http://127.0.0.1:4097").context("failed to create Opencode client")?;
+    let client = OpencodeClient::with_base_url("http://127.0.0.1:50065").context("failed to create Opencode client")?;
 
     // Create a session for prompting
     let session_resp = client
@@ -56,9 +58,40 @@ async fn sse_listener(client: &OpencodeClient) -> Result<()> {
     match resp {
         EventSubscribeResponse::Ok(mut stream) => {
             println!("Connected: listening for SSE events...");
+            // Buffer to accumulate delta text per part_id
+            let mut delta_buf: HashMap<String, String> = HashMap::new();
             while let Some(event) = stream.next().await {
                 match event {
-                    Ok(ev) => println!("Event: {:?}", ev),
+                    Ok(ev) => match ev {
+                        Event::MessagePartDelta(d) => {
+                            delta_buf
+                                .entry(d.properties.part_id.clone())
+                                .or_default()
+                                .push_str(&d.properties.delta);
+                        }
+                        Event::SessionIdle(_) => {
+                            if !delta_buf.is_empty() {hi
+
+                                for (_, text) in delta_buf.drain() {
+                                    println!("Response:\n{}", text);
+                                }
+                            }
+                            println!("--- Ready for next input ---");
+                        }
+                        Event::SessionStatus(s) => {
+                            println!("[Status: {:?}]", s.properties.status);
+                        }
+                        Event::PermissionAsked(p) => {
+                            println!("[Permission requested: {:?}]", p.properties);
+                        }
+                        Event::QuestionAsked(q) => {
+                            println!("[Question: {:?}]", q.properties);
+                        }
+                        Event::SessionError(e) => {
+                            eprintln!("[Session error: {:?}]", e.properties.error);
+                        }
+                        _ => {}
+                    },
                     Err(e) => eprintln!("Event parse error: {}", e),
                 }
             }
