@@ -70,8 +70,7 @@ async fn sse_listener(client: &OpencodeClient) -> Result<()> {
                                 .push_str(&d.properties.delta);
                         }
                         Event::SessionIdle(_) => {
-                            if !delta_buf.is_empty() {hi
-
+                            if !delta_buf.is_empty() {
                                 for (_, text) in delta_buf.drain() {
                                     println!("Response:\n{}", text);
                                 }
