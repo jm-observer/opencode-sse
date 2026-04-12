@@ -944,54 +944,102 @@ impl Error {
     }
 }
 #[derive(Debug, Clone, PartialEq, Deserialize, oas3_gen_support::Default)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum Event {
     #[default]
+    #[serde(rename = "installation.updated")]
     InstallationUpdated(EventInstallationUpdated),
+    #[serde(rename = "installation.update-available")]
     InstallationUpdateAvailable(EventInstallationUpdateAvailable),
+    #[serde(rename = "project.updated")]
     ProjectUpdated(EventProjectUpdated),
+    #[serde(rename = "server.instance.disposed")]
     ServerInstanceDisposed(EventServerInstanceDisposed),
+    #[serde(rename = "server.connected")]
     ServerConnected(EventServerConnected),
+    #[serde(rename = "global.disposed")]
     GlobalDisposed(EventGlobalDisposed),
+    #[serde(rename = "lsp.client.diagnostics")]
     LspClientDiagnostics(EventLspClientDiagnostics),
+    #[serde(rename = "lsp.updated")]
     LspUpdated(EventLspUpdated),
+    #[serde(rename = "file.edited")]
     FileEdited(EventFileEdited),
+    #[serde(rename = "message.updated")]
     MessageUpdated(EventMessageUpdated),
+    #[serde(rename = "message.removed")]
     MessageRemoved(EventMessageRemoved),
+    #[serde(rename = "message.part.updated")]
     MessagePartUpdated(EventMessagePartUpdated),
+    #[serde(rename = "message.part.delta")]
     MessagePartDelta(EventMessagePartDelta),
+    #[serde(rename = "message.part.removed")]
     MessagePartRemoved(EventMessagePartRemoved),
+    #[serde(rename = "permission.asked")]
     PermissionAsked(EventPermissionAsked),
+    #[serde(rename = "permission.replied")]
     PermissionReplied(EventPermissionReplied),
+    #[serde(rename = "session.status")]
     SessionStatus(EventSessionStatus),
+    #[serde(rename = "session.idle")]
     SessionIdle(EventSessionIdle),
+    #[serde(rename = "question.asked")]
     QuestionAsked(EventQuestionAsked),
+    #[serde(rename = "question.replied")]
     QuestionReplied(EventQuestionReplied),
+    #[serde(rename = "question.rejected")]
     QuestionRejected(EventQuestionRejected),
+    #[serde(rename = "session.compacted")]
     SessionCompacted(EventSessionCompacted),
+    #[serde(rename = "file.watcher.updated")]
     FileWatcherUpdated(EventFileWatcherUpdated),
+    #[serde(rename = "todo.updated")]
     TodoUpdated(EventTodoUpdated),
+    #[serde(rename = "tui.prompt.append")]
     TuiPromptAppend(EventTuiPromptAppend),
+    #[serde(rename = "tui.command.execute")]
     TuiCommandExecute(EventTuiCommandExecute),
+    #[serde(rename = "tui.toast.show")]
     TuiToastShow(EventTuiToastShow),
+    #[serde(rename = "tui.session.select")]
     TuiSessionSelect(EventTuiSessionSelect),
+    #[serde(rename = "mcp.tools.changed")]
     McpToolsChanged(EventMcpToolsChanged),
+    #[serde(rename = "mcp.browser.open.failed")]
     McpBrowserOpenFailed(EventMcpBrowserOpenFailed),
+    #[serde(rename = "command.executed")]
     CommandExecuted(EventCommandExecuted),
+    #[serde(rename = "session.created")]
     SessionCreated(EventSessionCreated),
+    #[serde(rename = "session.updated")]
     SessionUpdated(EventSessionUpdated),
+    #[serde(rename = "session.deleted")]
     SessionDeleted(EventSessionDeleted),
+    #[serde(rename = "session.diff")]
     SessionDiff(EventSessionDiff),
+    #[serde(rename = "session.error")]
     SessionError(EventSessionError),
+    #[serde(rename = "vcs.branch.updated")]
     VcsBranchUpdated(EventVcsBranchUpdated),
+    #[serde(rename = "workspace.ready")]
     WorkspaceReady(EventWorkspaceReady),
+    #[serde(rename = "workspace.failed")]
     WorkspaceFailed(EventWorkspaceFailed),
+    #[serde(rename = "pty.created")]
     PtyCreated(EventPtyCreated),
+    #[serde(rename = "pty.updated")]
     PtyUpdated(EventPtyUpdated),
+    #[serde(rename = "pty.exited")]
     PtyExited(EventPtyExited),
+    #[serde(rename = "pty.deleted")]
     PtyDeleted(EventPtyDeleted),
+    #[serde(rename = "worktree.ready")]
     WorktreeReady(EventWorktreeReady),
+    #[serde(rename = "worktree.failed")]
     WorktreeFailed(EventWorktreeFailed),
+    /// Catch-all for unknown/new event types (e.g. server.heartbeat)
+    #[serde(other)]
+    Unknown,
 }
 #[derive(Debug, Clone, PartialEq, Deserialize, oas3_gen_support::Default)]
 #[serde(default)]
