@@ -85,7 +85,7 @@ async fn run_sse_stream(client: &OpencodeClient) -> Result<()> {
     };
 
     println!("Connected: listening for SSE events...");
-    let mut delta_buf: HashMap<String, String> = HashMap::new();
+    let mut delta_buf: HashMap<String, HashMap<String, String>> = HashMap::new();
 
     loop {
         match time::timeout(SSE_READ_TIMEOUT, stream.next()).await {
@@ -98,21 +98,46 @@ async fn run_sse_stream(client: &OpencodeClient) -> Result<()> {
 }
 
 /// 事件处理（独立函数，便于重连后复用）
-fn handle_event(event: Event, delta_buf: &mut HashMap<String, String>) {
+fn handle_event(event: Event, text_buf: &mut HashMap<String, HashMap<String, String>>,) {
     match event {
-        Event::MessagePartDelta(d) => {
-            delta_buf
-                .entry(d.properties.part_id.clone())
-                .or_default()
-                .push_str(&d.properties.delta);
+        Event::MessagePartUpdated(ev) => {
+            // println!("MessagePartUpdated: {:?}", ev);
+            match &*ev.properties.part {
+                Part::StepStart(_step) => {
+                    // println!(
+                    //         "SSE: step-start message_id={}, session_id={}",
+                    //         step.message_id, step.session_id
+                    //     );
+                    // delta_buf
+                    //     .insert(step.message_id.clone(), step.session_id.clone());
+                }
+                Part::Text(text_part) => {
+                    // Accumulate text keyed by (message_id, part_id)
+                    text_buf
+                        .entry(text_part.message_id.clone())
+                        .or_default()
+                        .insert(text_part.id.clone(), text_part.text.clone());
+                }
+                Part::StepFinish(step) => {
+                    let oc_message_id = &step.message_id;
+                    if let Some(parts) = text_buf.remove(oc_message_id) {
+                        let combined: String =
+                            parts.into_values().collect::<Vec<_>>().join("");
+                        if combined.is_empty() {
+                            println!("[No response text received]");
+                        } else {
+                            println!("response: {combined}");
+                        }
+                    } else {
+                        println!("[No response text received]");
+                    };
+                }
+                _other => {}
+            }
+        }
+        Event::MessagePartDelta(_d) => {
         }
         Event::SessionIdle(_) => {
-            if !delta_buf.is_empty() {
-                for (_, text) in delta_buf.drain() {
-                    println!("Response:\n{}", text);
-                }
-            }
-            println!("--- Ready for next input ---");
         }
         Event::SessionStatus(s) => println!("[Status: {:?}]", s.properties.status),
         Event::PermissionAsked(p) => println!("[Permission requested: {:?}]", p.properties),
