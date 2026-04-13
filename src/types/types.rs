@@ -3494,20 +3494,32 @@ pub struct OutputFormatText {
     pub r#type: String,
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, oas3_gen_support::Default)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum Part {
     #[default]
+    #[serde(rename = "text")]
     Text(TextPart),
+    #[serde(rename = "subtask")]
     Subtask(SubtaskPart),
+    #[serde(rename = "reasoning")]
     Reasoning(ReasoningPart),
+    #[serde(rename = "file")]
     File(FilePart),
+    #[serde(rename = "tool")]
     Tool(ToolPart),
+    #[serde(rename = "step-start")]
     StepStart(StepStartPart),
+    #[serde(rename = "step-finish")]
     StepFinish(StepFinishPart),
+    #[serde(rename = "snapshot")]
     Snapshot(SnapshotPart),
+    #[serde(rename = "patch")]
     Patch(PatchPart),
+    #[serde(rename = "agent")]
     Agent(AgentPart),
+    #[serde(rename = "retry")]
     Retry(RetryPart),
+    #[serde(rename = "compaction")]
     Compaction(CompactionPart),
 }
 /// Delete a part from a message
