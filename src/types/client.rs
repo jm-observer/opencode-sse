@@ -8,6 +8,7 @@
 //!
 //! opencode api
 
+use std::time::Duration;
 use super::types::*;
 use anyhow::Context;
 use reqwest::{Client, Url};
@@ -28,15 +29,26 @@ impl OpencodeClient {
     #[must_use]
     #[track_caller]
     pub fn new() -> Self {
+        let client = reqwest::Client::builder()
+            .tcp_keepalive(Duration::from_secs(15))
+            .pool_idle_timeout(None)
+            .build()
+            .expect("failed to build HTTP client");
+
         Self {
-            client: Client::builder().build().expect("client"),
+            client,
             base_url: Url::parse(BASE_URL).expect("valid base url"),
         }
     }
     /// Create a client with a custom base URL.
     pub fn with_base_url(base_url: impl AsRef<str>) -> anyhow::Result<Self> {
+        let client = reqwest::Client::builder()
+            .tcp_keepalive(Duration::from_secs(15))
+            .pool_idle_timeout(None)
+            .build()
+            .context("failed to build HTTP client")?;
         Ok(Self {
-            client: Client::builder().build().context("building reqwest client")?,
+            client,
             base_url: Url::parse(base_url.as_ref()).context("parsing base url")?,
         })
     }
