@@ -98,7 +98,7 @@ async fn run_sse_stream(client: &OpencodeClient) -> Result<()> {
 }
 
 /// 事件处理（独立函数，便于重连后复用）
-fn handle_event(event: Event, text_buf: &mut HashMap<String, HashMap<String, String>>,) {
+fn handle_event(event: Event, text_buf: &mut HashMap<String, HashMap<String, String>>) {
     match event {
         Event::MessagePartUpdated(ev) => {
             // println!("MessagePartUpdated: {:?}", ev);
@@ -121,8 +121,7 @@ fn handle_event(event: Event, text_buf: &mut HashMap<String, HashMap<String, Str
                 Part::StepFinish(step) => {
                     let oc_message_id = &step.message_id;
                     if let Some(parts) = text_buf.remove(oc_message_id) {
-                        let combined: String =
-                            parts.into_values().collect::<Vec<_>>().join("");
+                        let combined: String = parts.into_values().collect::<Vec<_>>().join("");
                         if combined.is_empty() {
                             println!("[No response text received]");
                         } else {
@@ -135,10 +134,8 @@ fn handle_event(event: Event, text_buf: &mut HashMap<String, HashMap<String, Str
                 _other => {}
             }
         }
-        Event::MessagePartDelta(_d) => {
-        }
-        Event::SessionIdle(_) => {
-        }
+        Event::MessagePartDelta(_d) => {}
+        Event::SessionIdle(_) => {}
         Event::SessionStatus(s) => println!("[Status: {:?}]", s.properties.status),
         Event::PermissionAsked(p) => println!("[Permission requested: {:?}]", p.properties),
         Event::QuestionAsked(q) => println!("[Question: {:?}]", q.properties),

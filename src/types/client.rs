@@ -8,10 +8,10 @@
 //!
 //! opencode api
 
-use std::time::Duration;
 use super::types::*;
 use anyhow::Context;
 use reqwest::{Client, Url};
+use std::time::Duration;
 use validator::Validate;
 pub const BASE_URL: &str = "https://example.com/";
 #[derive(Debug, Clone)]
