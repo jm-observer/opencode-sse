@@ -4,12 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-sseer = { version = "0.2", features = ["reqwest"] }
-thiserror = "1.0"
 futures = "0.3"
 tokio = { version = "1", features = ["full"] }
-log = "0.4"
-custom-utils = "0.10.21"
 reqwest = { version = "0.13", default-features = false, features = ["json", "stream", "query"] }
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }
@@ -19,6 +15,6 @@ validator = { version = "0.20.0", features = ["derive"] }
 regex = "1.12.3"
 serde_with = "3.18.0"
 http = "1.4.0"
-[features]
-default = []
-prod = ["custom-utils/prod"]
+#[features]
+#default = []
+#prod = ["custom-utils/prod"]
